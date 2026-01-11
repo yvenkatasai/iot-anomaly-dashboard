@@ -1,13 +1,22 @@
-import React from 'react';
-
-export default function StatsCards({ stats }) {
-  if (!stats) return null;
+export default function StatCard({ title, value, danger }) {
   return (
-    <div style={{ display: 'flex', gap: 12, padding: 12 }}>
-      <div>Count: <strong>{stats.count}</strong></div>
-      <div>Avg: <strong>{Number(stats.avg).toFixed(2)}</strong></div>
-      <div>Min: <strong>{stats.min}</strong></div>
-      <div>Max: <strong>{stats.max}</strong></div>
+    <div
+      className="
+        backdrop-blur-xl bg-white/5 border border-white/10
+        rounded-2xl p-6 shadow-lg
+        hover:scale-[1.02] transition-transform
+      "
+    >
+      <p className="text-sm text-gray-400">{title}</p>
+
+      <p
+        className={`mt-2 text-3xl font-bold ${
+          danger ? "text-red-400" : "text-blue-400"
+        }`}
+      >
+        {value}
+      </p>
     </div>
+    
   );
 }

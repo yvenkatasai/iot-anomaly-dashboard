@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global polish */
+html, body {
+  height: 100%;
+}
+
+body {
+  background: radial-gradient(
+    circle at top,
+    #020617,
+    #020617 40%,
+    #020617
+  );
+  color: #e5e7eb;
+  font-family: ui-sans-serif, system-ui, -apple-system;
+}
+
+/* Soft scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+}

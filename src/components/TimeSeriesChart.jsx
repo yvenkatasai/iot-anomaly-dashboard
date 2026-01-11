@@ -1,86 +1,61 @@
 import {
-  Chart as ChartJS,
-  TimeScale,
-  LinearScale,
-  PointElement,
-  LineElement,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
   Tooltip,
-  Legend
-} from "chart.js";
-import { Line } from "react-chartjs-2";
-import "chartjs-adapter-date-fns";
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 
-ChartJS.register(
-  TimeScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend
-);
+function formatTime(date) {
+  return date.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+}
 
 export default function TimeSeriesChart({ data }) {
-  const normal = data.filter(d => !d.isAnomaly);
-  const anomalies = data.filter(d => d.isAnomaly);
+  if (!data || data.length === 0) {
+    return <div style={{ height: 300 }}>Waiting for data…</div>;
+  }
 
-  const chartData = {
-    datasets: [
-      {
-        label: "Normal Values",
-        data: normal.map(d => ({
-          x: d.parsedTime,
-          y: d.value
-        })),
-        borderColor: "#3b82f6",
-        backgroundColor: "rgba(59,130,246,0.15)",
-        pointRadius: 3,
-        tension: 0.3
-      },
-      {
-        label: "Anomalies",
-        data: anomalies.map(d => ({
-          x: d.parsedTime,
-          y: d.value,
-          reason: d.reason
-        })),
-        backgroundColor: "#ef4444",
-        borderColor: "#ef4444",
-        pointRadius: 8,
-        showLine: false
-      }
-    ]
-  };
-
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        type: "time",
-        time: { unit: "minute" }
-      },
-      y: {
-        title: {
-          display: true,
-          text: "Sensor Value"
-        }
-      }
-    },
-    plugins: {
-      tooltip: {
-        callbacks: {
-          label: (ctx) =>
-            ctx.raw.reason
-              ? `Value: ${ctx.raw.y} | ${ctx.raw.reason}`
-              : `Value: ${ctx.raw.y}`
-        }
-      }
-    }
-  };
+  const chartData = data.map((d) => ({
+    x: d.time.getTime(),   // numeric, monotonic
+    value: d.value,
+  }));
 
   return (
-    <div style={{ height: 350 }}>
-      <Line data={chartData} options={options} />
+    <div style={{ width: "100%", height: 360 }}>
+      <ResponsiveContainer>
+        <LineChart data={chartData}>
+          <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
+
+          <XAxis
+            dataKey="x"
+            type="number"
+            domain={["dataMin", "dataMax"]}
+            tickFormatter={(v) => formatTime(new Date(v))}
+          />
+
+          <YAxis domain={["auto", "auto"]} />
+
+          <Tooltip
+            labelFormatter={(v) => formatTime(new Date(v))}
+          />
+
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke="#2563eb"
+            strokeWidth={2.5}
+            dot={false}
+            isAnimationActive
+          />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 }
